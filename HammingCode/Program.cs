@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 
+using bit = System.Int16;
 
 namespace HammingCode
 {
@@ -27,7 +28,7 @@ namespace HammingCode
 
         private static void Main(string[] args)
         {
-            #region read message
+            #region read message from file
             string messageText = File.ReadAllText(inputTextFilePath);
             FileInfo oldOutputFile = new FileInfo(outputFilePath);
             oldOutputFile.Delete();
@@ -36,7 +37,7 @@ namespace HammingCode
 
             int messageLength = messageText.Length;
             string[] encodedWords = new string[messageLength];
-            #region
+            #endregion
 
             #region encode
             // Every character's ascii representation is encoded and saved to the "Encoded" file
@@ -89,7 +90,11 @@ namespace HammingCode
             Console.ReadKey();
         }
 
-        //Multiply the Hamming matrix by a code vector
+        /// <summary>
+        /// Returns the Hamming matrix multiplied by a code vector
+        /// </summary>
+        /// <param name="vector"></param>
+        /// <returns></returns>
         public static short[] MultiplyByHamming(short[] vector)
         {
             int[] errorTable = new int[m];
@@ -105,7 +110,12 @@ namespace HammingCode
             return result;
         }
 
-        //Encode a character to its code representation
+        /// <summary>
+        /// Encode a character to table of '0's and '1's.
+        /// Uses MultiplyByHamming to encode to
+        /// </summary>
+        /// <param name="character">character to encode</param>
+        /// <returns>table of '0's and '1's</returns>
         public static short[] Encode(char character)
         {
             short[] table = new short[n];
@@ -120,7 +130,11 @@ namespace HammingCode
             return table;
         }
 
-        //Decodes the binary code to ASCII
+        /// <summary>
+        /// Decodes the binary code of single character to ASCII
+        /// </summary>
+        /// <param name="codedTable">table of '0's and '1's</param>
+        /// <returns>Decode character</returns>
         public static char Decode(short[] codedTable)
         {
             short[] errorTable = MultiplyByHamming(codedTable);
@@ -153,8 +167,11 @@ namespace HammingCode
             return Convert.ToChar(ConvertToASCII(codedTable));
         }
 
-        //Check if any column corresponds to the error vector and returns the column's index
-        //If impossible, return -1
+        /// <summary>
+        /// Check if any column corresponds to the error vector.
+        /// </summary>
+        /// <param name="errorTable"></param>
+        /// <returns> Error column's index or -1 if impossible</returns>
         public static int OneError(short[] errorTable)
         {
             bool columnFound;
@@ -177,7 +194,11 @@ namespace HammingCode
             return -1;
         }
 
-        //Analogous to the previous method, only checks for the boolean sum of two columns
+        /// <summary>
+        /// Seeks for two errors columns( checks for the boolean sum of two columns)
+        /// </summary>
+        /// <param name="errorTable"></param>
+        /// <returns> Error columns indexes or, if impossible, table with length of 2 and -1 on both positions</returns>
         public static int[] TwoErrors(short[] errorTable)
         {
             bool columnFound;
@@ -206,7 +227,11 @@ namespace HammingCode
             return new int[2] { -1, -1 };
         }
 
-        //Convert one byte of to ascii
+        /// <summary>
+        /// Convert one byte, represented as e.g. 010111..., to ascii
+        /// </summary>
+        /// <param name="table"> Minimum length is 8</param>
+        /// <returns></returns>
         public static int ConvertToASCII(short[] table)
         {
             double code = 0.0;
@@ -217,6 +242,11 @@ namespace HammingCode
             return (int)code;
         }
 
+        /// <summary>
+        /// Convert two bytes, represented as e.g. 010111..., to ascii
+        /// </summary>
+        /// <param name="table"> Minimum length is 16</param>
+        /// <returns></returns>
         public static short ConvertTwoBytesToASCII(short[] table)
         {
             double code = 0.0;
@@ -227,7 +257,11 @@ namespace HammingCode
             return (short)code;
         }
 
-        //Convert an ASCII character to its binary representation
+        /// <summary>
+        /// Convert an ASCII character to its binary (010100...) representation
+        /// </summary>
+        /// <param name="character">ASCII as int</param>
+        /// <returns>table of '0's and '1's</returns>
         public static short[] ASCIItoBinary(int character)
         {
             int temp;
@@ -245,7 +279,11 @@ namespace HammingCode
             return retTable;
         }
 
-        //Check if error table is correct
+        /// <summary>
+        /// Check if there is any error in error table
+        /// </summary>
+        /// <param name="errorTable"></param>
+        /// <returns></returns>
         public static bool CheckError(short[] errorTable)
         {
             for (int i = 0; i < m; i++)
