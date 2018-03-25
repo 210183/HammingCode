@@ -36,7 +36,7 @@ namespace HammingCode
 
             int messageLength = messageText.Length;
             string[] encodedWords = new string[messageLength];
-            #region
+            #endregion
 
             #region encode
             // Every character's ascii representation is encoded and saved to the "Encoded" file
