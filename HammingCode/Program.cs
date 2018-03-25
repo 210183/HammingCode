@@ -5,7 +5,7 @@ using bit = System.Int16;
 
 namespace HammingCode
 {
-    internal class Program
+    public class Program
     {
         private const int m = 8;
         private const int n = 16;
@@ -22,17 +22,22 @@ namespace HammingCode
             {1, 1, 0, 0, 1, 0, 0, 1,  0, 0, 0, 0, 0, 0, 0, 1}
         };
 
-        public static string inputTextFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\Input.txt";
-        public static string encodedFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\Encoded.txt";
-        public static string outputFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\BinaryEncoded.bin";
+        private static string inputTextFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\Input.txt";
+        private static string encodedFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\Encoded.txt";
+        private static string outputFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\BinaryEncoded.bin";
+
+        public static string InputTextFilePath { get => inputTextFilePath; set => inputTextFilePath = value; }
+        public static string EncodedFilePath { get => encodedFilePath; set => encodedFilePath = value; }
+        public static string OutputFilePath { get => outputFilePath; set => outputFilePath = value; }
+
 
         private static void Main(string[] args)
         {
             #region read message from file
-            string messageText = File.ReadAllText(inputTextFilePath);
-            FileInfo oldOutputFile = new FileInfo(outputFilePath);
+            string messageText = File.ReadAllText(InputTextFilePath);
+            FileInfo oldOutputFile = new FileInfo(OutputFilePath);
             oldOutputFile.Delete();
-            FileInfo outputFile = new FileInfo(outputFilePath);
+            FileInfo outputFile = new FileInfo(OutputFilePath);
             BinaryWriter bw = new BinaryWriter(outputFile.OpenWrite());
 
             int messageLength = messageText.Length;
@@ -57,7 +62,7 @@ namespace HammingCode
                 }
                 encodedWords[i] = temp;
             }
-            File.WriteAllLines(encodedFilePath, encodedWords);
+            File.WriteAllLines(EncodedFilePath, encodedWords);
             #endregion
 
             Console.WriteLine("If you wish, simulate errors in the encoded file");
@@ -66,7 +71,7 @@ namespace HammingCode
 
             #region decode
             string decodedWord = "";
-            string[] codeWords = File.ReadAllLines(encodedFilePath);
+            string[] codeWords = File.ReadAllLines(EncodedFilePath);
             short[] intCodeWords = new short[n];
 
             //Reading the saved bit sequences as Int16,

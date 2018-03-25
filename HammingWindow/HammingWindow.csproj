@@ -93,5 +93,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HammingCode\HammingCode.csproj">
+      <Project>{69e1c18b-9923-4d95-a9f2-1be7cda55dfd}</Project>
+      <Name>HammingCode</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
