@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HammingCode", "HammingCode\HammingCode.csproj", "{69E1C18B-9923-4D95-A9F2-1BE7CDA55DFD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69E1C18B-9923-4D95-A9F2-1BE7CDA55DFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69E1C18B-9923-4D95-A9F2-1BE7CDA55DFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69E1C18B-9923-4D95-A9F2-1BE7CDA55DFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69E1C18B-9923-4D95-A9F2-1BE7CDA55DFD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AE57B3DB-C93A-4781-8635-C43B4FD98873}
+	EndGlobalSection
+EndGlobal
