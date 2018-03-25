@@ -5,12 +5,16 @@ using bit = System.Int16;
 
 namespace HammingCode
 {
-    public class Program
+    internal class Program
     {
+        public static string inputTextFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\InputMessage.txt";
+        public static string encodedFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\EncodedMessage.txt";
+        public static string outputFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\EncodedMessage.bin";
+
         private const int m = 8;
         private const int n = 16;
 
-        public static short[,] H = new short[m, n]
+        public static bit[,] H = new bit[m, n]
         {
             {0, 1, 1, 1, 1, 0, 1, 1,  1, 0, 0, 0, 0, 0, 0, 0},
             {1, 1, 1, 1, 1, 1, 0, 0,  0, 1, 0, 0, 0, 0, 0, 0},
@@ -22,22 +26,13 @@ namespace HammingCode
             {1, 1, 0, 0, 1, 0, 0, 1,  0, 0, 0, 0, 0, 0, 0, 1}
         };
 
-        private static string inputTextFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\Input.txt";
-        private static string encodedFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\Encoded.txt";
-        private static string outputFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\BinaryEncoded.bin";
-
-        public static string InputTextFilePath { get => inputTextFilePath; set => inputTextFilePath = value; }
-        public static string EncodedFilePath { get => encodedFilePath; set => encodedFilePath = value; }
-        public static string OutputFilePath { get => outputFilePath; set => outputFilePath = value; }
-
-
         private static void Main(string[] args)
         {
             #region read message from file
-            string messageText = File.ReadAllText(InputTextFilePath);
-            FileInfo oldOutputFile = new FileInfo(OutputFilePath);
+            string messageText = File.ReadAllText(inputTextFilePath);
+            FileInfo oldOutputFile = new FileInfo(outputFilePath);
             oldOutputFile.Delete();
-            FileInfo outputFile = new FileInfo(OutputFilePath);
+            FileInfo outputFile = new FileInfo(outputFilePath);
             BinaryWriter bw = new BinaryWriter(outputFile.OpenWrite());
 
             int messageLength = messageText.Length;
@@ -45,14 +40,14 @@ namespace HammingCode
             #endregion
 
             #region encode
-            // Every character's ascii representation is encoded and saved to the "Encoded" file
+            // Every character's ascii representation is encoded and saved to the "Encoded.txt" file
             for (int i = 0; i < messageLength; i++)
             {
                 string temp = "";
-                short[] t = Encode(messageText[i]);
+                bit[] t = Encode(messageText[i]);
 
                 //save also binary representation
-                short letter = ConvertTwoBytesToASCII(t);
+                bit letter = ConvertTwoBytesToASCII(t);
                 bw.Write(letter);
 
                 // 01110010... string representation ???
@@ -62,17 +57,17 @@ namespace HammingCode
                 }
                 encodedWords[i] = temp;
             }
-            File.WriteAllLines(EncodedFilePath, encodedWords);
+            File.WriteAllLines(encodedFilePath, encodedWords);
             #endregion
 
-            Console.WriteLine("If you wish, simulate errors in the encoded file");
+            WriteLine($"You can now simulate errors by changing chosen bits in {Path.GetFileName(encodedFilePath)} file.\nWhen you finish, click any key.", ConsoleColor.Yellow);
             Console.ReadKey();
             Console.Clear();
 
             #region decode
             string decodedWord = "";
-            string[] codeWords = File.ReadAllLines(EncodedFilePath);
-            short[] intCodeWords = new short[n];
+            string[] codeWords = File.ReadAllLines(encodedFilePath);
+            bit[] intCodeWords = new bit[n];
 
             //Reading the saved bit sequences as Int16,
             //Then decoding each code word to ASCII
@@ -89,10 +84,31 @@ namespace HammingCode
                 decodedWord += decodedChar;
             }
 
-            Console.WriteLine("Full decoded word: " + decodedWord);
+            WriteLine("Decoded message: ", ConsoleColor.DarkCyan);
+            WriteLine(decodedWord, ConsoleColor.Cyan);
             #endregion
 
             Console.ReadKey();
+        }
+        /// <summary>
+        /// Writes line of text with given color (by default: White)
+        /// </summary>
+        private static void WriteLine(string text, ConsoleColor color = ConsoleColor.White)
+        {
+            var oldColor = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            Console.WriteLine(text);
+            Console.ForegroundColor = oldColor;
+        }
+        /// <summary>
+        /// Writes text with given color (by default: White)
+        /// </summary>
+        private static void Write(string text, ConsoleColor color = ConsoleColor.White)
+        {
+            var oldColor = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            Console.Write(text);
+            Console.ForegroundColor = oldColor;
         }
 
         /// <summary>
@@ -100,10 +116,10 @@ namespace HammingCode
         /// </summary>
         /// <param name="vector"></param>
         /// <returns></returns>
-        public static short[] MultiplyByHamming(short[] vector)
+        public static bit[] MultiplyByHamming(bit[] vector)
         {
             int[] errorTable = new int[m];
-            short[] result = new short[m];
+            bit[] result = new bit[m];
             for (int i = 0; i < m; i++)
             {
                 for (int j = 0; j < n; j++)
@@ -121,10 +137,10 @@ namespace HammingCode
         /// </summary>
         /// <param name="character">character to encode</param>
         /// <returns>table of '0's and '1's</returns>
-        public static short[] Encode(char character)
+        public static bit[] Encode(char character)
         {
-            short[] table = new short[n];
-            short[] errorTable = new short[m];
+            bit[] table = new bit[n];
+            bit[] errorTable = new bit[m];
             int ascii = Convert.ToInt32(character);
             table = ASCIItoBinary(ascii);
             errorTable = MultiplyByHamming(table);
@@ -140,24 +156,24 @@ namespace HammingCode
         /// </summary>
         /// <param name="codedTable">table of '0's and '1's</param>
         /// <returns>Decode character</returns>
-        public static char Decode(short[] codedTable)
+        public static char Decode(bit[] codedTable)
         {
-            short[] errorTable = MultiplyByHamming(codedTable);
-            if (CheckError(errorTable))
+            bit[] errorTable = MultiplyByHamming(codedTable);
+            if (CheckForError(errorTable))
             {
-                int x = OneError(errorTable);
+                int x = SeekForOneError(errorTable);
                 if (x != -1)
                 {
-                    Console.Write("Bit no." + x + " was scrambled: ");
+                    Write("Bit on position " + x + " was distorted: ", ConsoleColor.DarkRed);
                     codedTable[x] += 1;
                     codedTable[x] %= 2;
                 }
                 else
                 {
-                    if (TwoErrors(errorTable)[0] != -1)
+                    if (SeekForTwoErrors(errorTable)[0] != -1)
                     {
-                        var errorIndexes = TwoErrors(errorTable);
-                        Console.Write("Bits no." + errorIndexes[0] + " and " + errorIndexes[1] + " were scrambled: ");
+                        var errorIndexes = SeekForTwoErrors(errorTable);
+                        Write("Bits on positions " + errorIndexes[0] + " and " + errorIndexes[1] + " were distorted: ", ConsoleColor.DarkRed);
                         codedTable[errorIndexes[0]] += 1;
                         codedTable[errorIndexes[0]] %= 2;
                         codedTable[errorIndexes[1]] += 1;
@@ -165,7 +181,7 @@ namespace HammingCode
                     }
                     else
                     {
-                        Console.Write("Too many bits were scrambled ");
+                        Write("Code word is too distorted. ", ConsoleColor.Red);
                     }
                 }
             }
@@ -177,7 +193,7 @@ namespace HammingCode
         /// </summary>
         /// <param name="errorTable"></param>
         /// <returns> Error column's index or -1 if impossible</returns>
-        public static int OneError(short[] errorTable)
+        public static int SeekForOneError(bit[] errorTable)
         {
             bool columnFound;
             for (int i = 0; i < n; i++)
@@ -204,7 +220,7 @@ namespace HammingCode
         /// </summary>
         /// <param name="errorTable"></param>
         /// <returns> Error columns indexes or, if impossible, table with length of 2 and -1 on both positions</returns>
-        public static int[] TwoErrors(short[] errorTable)
+        public static int[] SeekForTwoErrors(bit[] errorTable)
         {
             bool columnFound;
             int[] columns = new int[2];
@@ -237,7 +253,7 @@ namespace HammingCode
         /// </summary>
         /// <param name="table"> Minimum length is 8</param>
         /// <returns></returns>
-        public static int ConvertToASCII(short[] table)
+        public static int ConvertToASCII(bit[] table)
         {
             double code = 0.0;
             for (int i = 0, j = 7; i < m; i++, j--)
@@ -252,14 +268,14 @@ namespace HammingCode
         /// </summary>
         /// <param name="table"> Minimum length is 16</param>
         /// <returns></returns>
-        public static short ConvertTwoBytesToASCII(short[] table)
+        public static bit ConvertTwoBytesToASCII(bit[] table)
         {
             double code = 0.0;
             for (int i = 0, j = 15; i < n; i++, j--)
             {
                 code += (table[i] * Math.Pow(2.0, j));
             }
-            return (short)code;
+            return (bit)code;
         }
 
         /// <summary>
@@ -267,10 +283,10 @@ namespace HammingCode
         /// </summary>
         /// <param name="character">ASCII as int</param>
         /// <returns>table of '0's and '1's</returns>
-        public static short[] ASCIItoBinary(int character)
+        public static bit[] ASCIItoBinary(int character)
         {
             int temp;
-            short[] retTable = new short[n];
+            bit[] retTable = new bit[n];
             for (int i = 7; i != 0; i--)
             {
                 temp = character % 2;
@@ -289,7 +305,7 @@ namespace HammingCode
         /// </summary>
         /// <param name="errorTable"></param>
         /// <returns></returns>
-        public static bool CheckError(short[] errorTable)
+        public static bool CheckForError(bit[] errorTable)
         {
             for (int i = 0; i < m; i++)
             {
