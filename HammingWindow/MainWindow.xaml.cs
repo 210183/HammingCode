@@ -1,5 +1,4 @@
-﻿using HammingCode;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,9 +43,9 @@ namespace HammingWindow
         private static string decodedMessage;
         private int messageLength;
 
-        private static string inputTextFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\Input.txt";
-        private static string encodedFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\Encoded.txt";
-        private static string outputFilePath = @"C:\Users\Lola\Desktop\HammingCode\HammingCode\HammingCode\BinaryEncoded.bin";
+        private static string inputTextFilePath = "";
+        private static string encodedFilePath = "";
+        private static string outputFilePath = "";
 
         public static string InputTextFilePath { get => inputTextFilePath; set => inputTextFilePath = value; }
         public static string EncodedFilePath { get => encodedFilePath; set => encodedFilePath = value; }
@@ -86,67 +85,75 @@ namespace HammingWindow
         }
         private void Encode_Click(object sender, RoutedEventArgs e)
         {
-            #region read message from file
-            string messageText = File.ReadAllText(inputTextFilePath);
-            FileInfo oldOutputFile = new FileInfo(outputFilePath);
-            oldOutputFile.Delete();
-            FileInfo outputFile = new FileInfo(outputFilePath);
-            BinaryWriter bw = new BinaryWriter(outputFile.OpenWrite());
-
-            messageLength = messageText.Length;
-            string[] encodedWords = new string[messageLength];
-            #endregion
-
-            #region encode
-            // Every character's ascii representation is encoded and saved to the "Encoded.txt" file
-            for (int i = 0; i < messageLength; i++)
+            if(inputTextFilePath != "")
             {
-                string temp = "";
-                bit[] t = Encode(messageText[i]);
+                #region read message from file
+                string messageText = File.ReadAllText(inputTextFilePath);
+                FileInfo oldOutputFile = new FileInfo(outputFilePath);
+                oldOutputFile.Delete();
+                FileInfo outputFile = new FileInfo(outputFilePath);
+                BinaryWriter bw = new BinaryWriter(outputFile.OpenWrite());
 
-                //save also binary representation
-                bit letter = ConvertTwoBytesToASCII(t);
-                bw.Write(letter);
+                messageLength = messageText.Length;
+                string[] encodedWords = new string[messageLength];
+                #endregion
 
-                // 01110010... string representation ???
-                for (int j = 0; j < n; j++)
+                #region encode
+                // Every character's ascii representation is encoded and saved to the "Encoded.txt" file
+                for (int i = 0; i < messageLength; i++)
                 {
-                    temp += Convert.ToString(t[j]);
-                }
-                encodedWords[i] = temp;
-            }
-            File.WriteAllLines(encodedFilePath, encodedWords);
-            #endregion
+                    string temp = "";
+                    bit[] t = Encode(messageText[i]);
 
-            EncodedMessage = "If you wish, simulate errors in the encoded file";
-            MessageBox.Show("Encoded");
+                    //save also binary representation
+                    bit letter = ConvertTwoBytesToASCII(t);
+                    bw.Write(letter);
+
+                    // 01110010... string representation ???
+                    for (int j = 0; j < n; j++)
+                    {
+                        temp += Convert.ToString(t[j]);
+                    }
+                    encodedWords[i] = temp;
+                }
+                File.WriteAllLines(encodedFilePath, encodedWords);
+                #endregion
+
+                EncodedMessage = "If you wish, simulate errors in the encoded file";
+                MessageBox.Show("Encoded");
+            }
+  
         }
 
         private void Decode_Click(object sender, RoutedEventArgs e)
         {
-            DecodedMessage = "";
-            string decodedWord = "";
-            string[] codeWords = File.ReadAllLines(encodedFilePath);
-            bit[] intCodeWords = new bit[n];
-
-            //Reading the saved bit sequences as Int16,
-            //Then decoding each code word to ASCII
-            for (int i = 0; i < messageLength; i++)
+            if(EncodedFilePath != "")
             {
-                for (int j = 0; j < n; j++)
-                {
-                    string temp = "";
-                    temp += codeWords[i][j];
-                    intCodeWords[j] = Int16.Parse(temp);
-                }
-                var decodedChar = Decode(intCodeWords, i);
-                //Console.WriteLine(decodedChar);
-                decodedWord += decodedChar;
+                DecodedMessage = "";
+                string decodedWord = "";
+                string[] codeWords = File.ReadAllLines(encodedFilePath);
+                bit[] intCodeWords = new bit[n];
 
-                DecodeTextBox.Text = DecodedMessage;
-                
+                //Reading the saved bit sequences as Int16,
+                //Then decoding each code word to ASCII
+                for (int i = 0; i < messageLength; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        string temp = "";
+                        temp += codeWords[i][j];
+                        intCodeWords[j] = Int16.Parse(temp);
+                    }
+                    var decodedChar = Decode(intCodeWords, i);
+                    //Console.WriteLine(decodedChar);
+                    decodedWord += decodedChar;
+
+                    DecodeTextBox.Text = DecodedMessage;
+
+                }
+                MessageBox.Show(decodedWord);
             }
-            MessageBox.Show(decodedWord);
+            
         }
 
             #region code&decode helper methods
